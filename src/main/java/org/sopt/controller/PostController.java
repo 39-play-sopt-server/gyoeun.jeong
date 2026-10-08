@@ -6,6 +6,8 @@ import org.sopt.domain.PostCategory;
 import org.sopt.service.PostService;
 import org.sopt.view.InputView;
 import org.sopt.view.OutputView;
+import org.sopt.service.exception.PostNotFoundException;
+import org.sopt.service.exception.InputClosedException;
 
 public class PostController {
     private final PostService service;
@@ -22,21 +24,28 @@ public class PostController {
 
     public void run() {
         while (true) {
-            outputView.printMenu();
-            outputView.printPrompt("선택: ");
-            int command = inputView.readCommand();
+            try {
+                outputView.printMenu();
+                outputView.printPrompt("선택: ");
+                int command = inputView.readCommand();
 
-            switch (command) {
-                case 1 -> createPost();
-                case 2 -> readPosts();
-                case 3 -> readPost();
-                case 4 -> updatePost();
-                case 5 -> deletePost();
-                case 6 -> {
-                    outputView.printMessage("프로그램을 종료합니다.");
-                    return;
+                switch (command) {
+                    case 1 -> createPost();
+                    case 2 -> readPosts();
+                    case 3 -> readPost();
+                    case 4 -> updatePost();
+                    case 5 -> deletePost();
+                    case 6 -> {
+                        outputView.printMessage("프로그램을 종료합니다.");
+                        return;
+                    }
+                    default -> outputView.printMessage("잘못된 입력입니다.");
                 }
-                default -> outputView.printMessage("잘못된 입력입니다.");
+            } catch (PostNotFoundException | IllegalArgumentException e) {
+                outputView.printMessage(e.getMessage());
+            } catch (InputClosedException e) {
+                outputView.printMessage("\n" + e.getMessage());
+                return;
             }
         }
     }

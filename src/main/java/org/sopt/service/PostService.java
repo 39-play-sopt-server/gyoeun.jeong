@@ -3,6 +3,8 @@ package org.sopt.service;
 import org.sopt.domain.Post;
 import org.sopt.domain.PostCategory;
 import org.sopt.repository.PostRepository;
+import org.sopt.service.exception.InvalidPostException;
+import org.sopt.service.exception.PostNotFoundException;
 
 public class PostService {
     private final PostRepository repository;
@@ -30,33 +32,42 @@ public class PostService {
     }
 
     public Post getPost(int index) {
+        validateIndex(index);
         return repository.get(index);
     }
 
     public void updatePost(int index, String title, String content, PostCategory category) {
+        Post post = getPost(index);
         validatePost(title, content, category);
         repository.get(index).update(title, content, category);
     }
 
     public void deletePost(int index) {
+        validateIndex(index);
         repository.remove(index);
     }
 
     private void validatePost(String title, String content, PostCategory category) {
         if (title == null || title.isBlank()) {
-            throw new IllegalArgumentException("제목이 비어있어요!");
+            throw new InvalidPostException("제목이 비어있어요!");
         }
         if (content == null || content.isBlank()) {
-            throw new IllegalArgumentException("본문이 비어있어요!");
+            throw new InvalidPostException("본문이 비어있어요!");
         }
         if (category == null) {
-            throw new IllegalArgumentException("카테고리를 선택해 주세요!");
+            throw new InvalidPostException("카테고리를 선택해 주세요!");
         }
     }
 
     private void validateAuthor(String author) {
         if (author == null || author.isBlank()) {
-            throw new IllegalArgumentException("작성자가 비어있어요!");
+            throw new InvalidPostException("작성자가 비어있어요!");
+        }
+    }
+
+    private void validateIndex(int index) {
+        if (index < 0 || index >= repository.size()) {
+            throw new PostNotFoundException();
         }
     }
 }
