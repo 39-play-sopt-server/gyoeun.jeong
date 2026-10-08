@@ -41,14 +41,21 @@ public class PostController {
     }
 
     private void createPost() {
-        outputView.printPrompt("제목: ");
-        String title = inputView.readTitle();
+        while (true) {
+            outputView.printPrompt("제목: ");
+            String title = inputView.readTitle();
 
-        outputView.printPrompt("내용: ");
-        String content = inputView.readContent();
+            outputView.printPrompt("내용: ");
+            String content = inputView.readContent();
 
-        service.createPost(title, content);
-        outputView.printMessage("게시글이 작성되었습니다.");
+            try {
+                service.createPost(title, content);
+                outputView.printMessage("게시글이 작성되었습니다.");
+                return;
+            } catch (IllegalArgumentException e) {
+                outputView.printMessage(e.getMessage());
+            }
+        }
     }
 
     private void readPosts() {
