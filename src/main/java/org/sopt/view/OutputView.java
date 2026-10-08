@@ -1,6 +1,7 @@
 package org.sopt.view;
 
 import org.sopt.domain.Post;
+import org.sopt.domain.PostCategory;
 
 public class OutputView {
     public void printMenu() {
@@ -17,10 +18,22 @@ public class OutputView {
         System.out.print(message);
     }
 
+    public void printCategoryOptions() {
+        System.out.println("카테고리를 영어로 입력해 주세요.");
+
+        for (PostCategory category : PostCategory.values()) {
+            System.out.println(
+                    category.name() + " - " + category.getDisplayName()
+            );
+        }
+    }
+
     public void printPost(Post post) {
         System.out.println("\n=== 게시글 ===");
+        System.out.println("카테고리: " + post.getCategory().getDisplayName());
         System.out.println("제목: " + post.getTitle());
         System.out.println("내용: " + post.getContent());
+        System.out.println("작성자: " + post.getAuthor());
     }
 
     public void printMessage(String message) {

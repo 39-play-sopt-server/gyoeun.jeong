@@ -3,10 +3,14 @@ package org.sopt.domain;
 public class Post {
     private String title;
     private String content;
+    private final String author;
+    private PostCategory category;
 
-    public Post(String title, String content) {
+    public Post(String title, String content, String author, PostCategory category) {
         this.title = title;
         this.content = content;
+        this.author = author;
+        this.category = category;
     }
 
     public String getTitle() {
@@ -17,11 +21,17 @@ public class Post {
         return this.content;
     }
 
-    public void updateTitle(String title) {
-        this.title = title;
+    public String getAuthor() {
+        return author;
     }
 
-    public void updateContent(String content) {
+    public PostCategory getCategory() {
+        return category;
+    }
+
+    public void update(String title, String content, PostCategory category) {
+        this.title = title;
         this.content = content;
+        this.category = category;
     }
 }
