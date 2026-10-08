@@ -29,24 +29,22 @@ public class PostService {
         return repository.findAll();
     }
 
-    public boolean isValidIndex(int index) {
-        return index >= 0 && index < repository.size();
+    public void ensurePostExists(int postNumber) {
+        toIndex(postNumber);
     }
 
-    public Post getPost(int index) {
-        validateIndex(index);
-        return repository.get(index);
+    public Post getPost(int postNumber) {
+        return repository.get(toIndex(postNumber));
     }
 
-    public void updatePost(int index, String title, String content, PostCategory category) {
-        Post post = getPost(index);
+    public void updatePost(int postNumber, String title, String content, PostCategory category) {
+        Post post = getPost(postNumber);
         validatePost(title, content, category);
-        repository.get(index).update(title, content, category);
+        post.update(title, content, category);
     }
 
-    public void deletePost(int index) {
-        validateIndex(index);
-        repository.remove(index);
+    public void deletePost(int postNumber) {
+        repository.remove(toIndex(postNumber));
     }
 
     private void validatePost(String title, String content, PostCategory category) {
@@ -67,9 +65,10 @@ public class PostService {
         }
     }
 
-    private void validateIndex(int index) {
-        if (index < 0 || index >= repository.size()) {
+    private int toIndex(int postNumber) {
+        if (postNumber < 1 || postNumber > repository.size()) {
             throw new PostNotFoundException();
         }
+        return postNumber - 1;
     }
 }

@@ -86,14 +86,8 @@ public class PostController {
         }
 
         outputView.printPrompt("조회할 게시글 번호: ");
-        int index = inputView.readPostNumber() - 1;
-
-        if (!service.isValidIndex(index)) {
-            outputView.printMessage("존재하지 않는 게시글입니다.");
-            return;
-        }
-
-        Post post = service.getPost(index);
+        int postNumber = inputView.readPostNumber();
+        Post post = service.getPost(postNumber);
         outputView.printPost(post);
     }
 
@@ -104,12 +98,8 @@ public class PostController {
         }
 
         outputView.printPrompt("수정할 게시글 번호: ");
-        int index = inputView.readPostNumber() - 1;
-
-        if (!service.isValidIndex(index)) {
-            outputView.printMessage("존재하지 않는 게시글입니다.");
-            return;
-        }
+        int postNumber = inputView.readPostNumber();
+        service.ensurePostExists(postNumber);
 
         while (true) {
             try {
@@ -123,7 +113,7 @@ public class PostController {
                 outputView.printPrompt("카테고리: ");
                 PostCategory newCategory = inputView.readCategory();
 
-                service.updatePost(index, newTitle, newContent, newCategory);
+                service.updatePost(postNumber, newTitle, newContent, newCategory);
                 outputView.printMessage("게시글이 수정되었습니다.");
                 return;
             } catch (IllegalArgumentException e) {
@@ -139,14 +129,8 @@ public class PostController {
         }
 
         outputView.printPrompt("삭제할 게시글 번호: ");
-        int index = inputView.readPostNumber() - 1;
-
-        if (!service.isValidIndex(index)) {
-            outputView.printMessage("존재하지 않는 게시글입니다.");
-            return;
-        }
-
-        service.deletePost(index);
+        int postNumber = inputView.readPostNumber();
+        service.deletePost(postNumber);
         outputView.printMessage("게시글이 삭제되었습니다.");
     }
 }
