@@ -1,10 +1,8 @@
-package org.sopt;
+package org.sopt.view;
 
-import java.util.Scanner;
+import org.sopt.domain.Post;
 
-public class PostView {
-    private final Scanner scanner = new Scanner(System.in);
-
+public class OutputView {
     public void printMenu() {
         System.out.println("\n=== 게시판 ===");
         System.out.println("1. 게시글 작성");
@@ -15,24 +13,8 @@ public class PostView {
         System.out.println("6. 종료");
     }
 
-    public int readCommand() {
-        System.out.print("선택: ");
-        return Integer.parseInt(scanner.nextLine());
-    }
-
-    public String readTitle() {
-        System.out.print("제목: ");
-        return scanner.nextLine();
-    }
-
-    public String readContent() {
-        System.out.print("내용: ");
-        return scanner.nextLine();
-    }
-
-    public int readPostNumber(String message) {
+    public void printPrompt(String message) {
         System.out.print(message);
-        return Integer.parseInt(scanner.nextLine());
     }
 
     public void printPost(Post post) {
