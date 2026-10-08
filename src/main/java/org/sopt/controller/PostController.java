@@ -4,10 +4,12 @@ package org.sopt.controller;
 import org.sopt.domain.Post;
 import org.sopt.domain.PostCategory;
 import org.sopt.service.PostService;
+import org.sopt.service.exception.InvalidPostException;
+import org.sopt.service.exception.PostNotFoundException;
 import org.sopt.view.InputView;
 import org.sopt.view.OutputView;
-import org.sopt.service.exception.PostNotFoundException;
-import org.sopt.service.exception.InputClosedException;
+import org.sopt.view.exception.InputClosedException;
+import org.sopt.view.exception.InvalidInputException;
 
 public class PostController {
     private final PostService service;
@@ -41,7 +43,7 @@ public class PostController {
                     }
                     default -> outputView.printMessage("잘못된 입력입니다.");
                 }
-            } catch (PostNotFoundException | IllegalArgumentException e) {
+            } catch (InvalidInputException | InvalidPostException | PostNotFoundException e) {
                 outputView.printMessage(e.getMessage());
             } catch (InputClosedException e) {
                 outputView.printMessage("\n" + e.getMessage());
@@ -69,7 +71,7 @@ public class PostController {
                 service.createPost(title, content, author, category);
                 outputView.printMessage("게시글이 작성되었습니다.");
                 return;
-            } catch (IllegalArgumentException e) {
+            } catch (InvalidInputException | InvalidPostException e) {
                 outputView.printMessage(e.getMessage());
             }
         }
@@ -116,7 +118,7 @@ public class PostController {
                 service.updatePost(postNumber, newTitle, newContent, newCategory);
                 outputView.printMessage("게시글이 수정되었습니다.");
                 return;
-            } catch (IllegalArgumentException e) {
+            } catch (InvalidInputException | InvalidPostException e) {
                 outputView.printMessage(e.getMessage());
             }
         }

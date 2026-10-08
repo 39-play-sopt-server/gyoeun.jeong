@@ -1,10 +1,12 @@
 package org.sopt.view;
 
-import java.util.Locale;
-import java.util.Scanner;
 import org.sopt.domain.PostCategory;
+import org.sopt.view.exception.InputClosedException;
+import org.sopt.view.exception.InvalidInputException;
+
+import java.util.Locale;
 import java.util.NoSuchElementException;
-import org.sopt.service.exception.InputClosedException;
+import java.util.Scanner;
 
 public class InputView {
     private final Scanner scanner = new Scanner(System.in);
@@ -13,7 +15,7 @@ public class InputView {
         try {
             return scanner.nextLine();
         } catch (NoSuchElementException e) {
-            throw new InputClosedException();
+            throw new InputClosedException(e);
         }
     }
 
@@ -21,7 +23,7 @@ public class InputView {
         try {
             return Integer.parseInt(readLine().trim());
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("메뉴 번호를 숫자로 입력해 주세요!");
+            throw new InvalidInputException("메뉴 번호를 숫자로 입력해 주세요!", e);
         }
     }
 
@@ -43,15 +45,15 @@ public class InputView {
         try {
             return PostCategory.valueOf(input);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("올바른 카테고리를 입력해 주세요.");
+            throw new InvalidInputException("올바른 카테고리를 입력해 주세요.", e);
         }
     }
 
     public int readPostNumber() {
         try {
-        return Integer.parseInt(readLine().trim());
+            return Integer.parseInt(readLine().trim());
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("게시글 번호를 숫자로 입력해 주세요!");
+            throw new InvalidInputException("게시글 번호를 숫자로 입력해 주세요!", e);
         }
     }
 }
