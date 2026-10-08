@@ -3,6 +3,8 @@ package org.sopt.view;
 import org.sopt.domain.Post;
 import org.sopt.domain.PostCategory;
 
+import java.util.List;
+
 public class OutputView {
     public void printMenu() {
         System.out.println("\n=== 게시판 ===");
@@ -34,6 +36,17 @@ public class OutputView {
         System.out.println("제목: " + post.getTitle());
         System.out.println("내용: " + post.getContent());
         System.out.println("작성자: " + post.getAuthor());
+    }
+
+    public void printPosts(List<Post> posts) {
+        if (posts.isEmpty()) {
+            printMessage("게시글이 없습니다.");
+            return;
+        }
+
+        for (int i = 0; i < posts.size(); i++) {
+            printMessage((i + 1) + ". " + posts.get(i).getTitle());
+        }
     }
 
     public void printMessage(String message) {

@@ -6,6 +6,8 @@ import org.sopt.repository.PostRepository;
 import org.sopt.service.exception.InvalidPostException;
 import org.sopt.service.exception.PostNotFoundException;
 
+import java.util.List;
+
 public class PostService {
     private final PostRepository repository;
 
@@ -23,8 +25,8 @@ public class PostService {
         return repository.isEmpty();
     }
 
-    public int getPostCount() {
-        return repository.size();
+    public List<Post> getPosts() {
+        return repository.findAll();
     }
 
     public boolean isValidIndex(int index) {

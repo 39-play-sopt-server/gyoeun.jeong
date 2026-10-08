@@ -76,16 +76,7 @@ public class PostController {
     }
 
     private void readPosts() {
-        if (service.isEmpty()) {
-            outputView.printMessage("게시글이 없습니다.");
-            return;
-        }
-
-        for (int i = 0; i < service.getPostCount(); i++) {
-            outputView.printMessage(
-                    (i + 1) + ". " + service.getPost(i).getTitle()
-            );
-        }
+        outputView.printPosts(service.getPosts());
     }
 
     private void readPost() {

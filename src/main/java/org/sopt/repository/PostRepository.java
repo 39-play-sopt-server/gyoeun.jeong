@@ -16,6 +16,10 @@ public class PostRepository {
         return posts.isEmpty();
     }
 
+    public List<Post> findAll() {
+        return List.copyOf(posts);
+    }
+
     public int size() {
         return posts.size();
     }
