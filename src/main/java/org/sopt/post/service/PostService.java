@@ -20,10 +20,12 @@ public class PostService {
         this.repository = repository;
     }
 
-    public void createPost(String title, String content, String author, PostCategory category) {
+    public Post createPost(String title, String content, String author, PostCategory category) {
         validatePost(title, content, category);
         validateAuthor(author);
-        repository.add(new Post(title, content, author, category, nextId++));
+        Post post = new Post(title, content, author, category, nextId++);
+        repository.add(post);
+        return post;
     }
 
     public boolean isEmpty() {
