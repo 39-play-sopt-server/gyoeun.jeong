@@ -34,27 +34,24 @@ public class PostService {
         return repository.findAll();
     }
 
-    public void ensurePostExists(int postNumber) {
-        toIndex(postNumber);
+    public void ensurePostExists(long postId) {
+        getPost(postId);
     }
 
-    public Post getPost(int postNumber) {
-        return repository.get(toIndex(postNumber));
+    public Post getPost(long postId) {
+        return repository.findById(postId)
+            .orElseThrow(() -> new PostNotFoundException());
     }
 
-    public void updatePost(int postNumber, String title, String content, PostCategory category) {
-        Post post = getPost(postNumber);
+    public void updatePost(long postId, String title, String content, PostCategory category) {
+        Post post = getPost(postId);
         validatePost(title, content, category);
         post.update(title, content, category);
     }
 
-    public void deletePost(int postNumber) {
-        Post post = PostRepository.findById(postNumber)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "게시글이 없습니다."
-                ));
-
-        repository.remove(toIndex(postNumber));
+    public void deletePost(long postId) {
+        getPost(postId);
+        repository.deleteById(postId);
     }
 
     private void validatePost(String title, String content, PostCategory category) {
@@ -74,18 +71,4 @@ public class PostService {
             throw new InvalidPostException("작성자가 비어있어요!");
         }
     }
-
-    private int toIndex(int postNumber) {
-        if (postNumber < 1 || postNumber > repository.size()) {
-            throw new PostNotFoundException();
-        }
-        return postNumber - 1;
-    }
-
-//    private Post findPostOrThrow(int postNumber) {
-//        return PostRepository.findById(postNumber)
-//                .orElseThrow(() -> new ResponseStatusException(
-//                        HttpStatus.NOT_FOUND, "게시글이 없습니다"
-//                ));
-//    }
 }

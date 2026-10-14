@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class PostRepository {
@@ -23,12 +24,8 @@ public class PostRepository {
         return List.copyOf(posts.values());
     }
 
-    public int size() {
-        return posts.size();
-    }
-
-    public Post findById(long id) {
-        return posts.get(id);
+    public Optional<Post> findById(long id) {
+        return Optional.ofNullable(posts.get(id));
     }
 
     public void deleteById(long id) {
