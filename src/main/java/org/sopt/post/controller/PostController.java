@@ -1,56 +1,59 @@
 // PostController
-package org.sopt.controller;
+package org.sopt.post.controller;
 
-import org.sopt.domain.Post;
-import org.sopt.domain.PostCategory;
-import org.sopt.service.PostService;
-import org.sopt.service.exception.InvalidPostException;
-import org.sopt.service.exception.PostNotFoundException;
-import org.sopt.view.InputView;
-import org.sopt.view.OutputView;
-import org.sopt.view.exception.InputClosedException;
-import org.sopt.view.exception.InvalidInputException;
+import org.sopt.post.domain.Post;
+import org.sopt.post.domain.PostCategory;
+import org.sopt.post.service.PostService;
+import org.sopt.post.exception.InvalidPostException;
+import org.sopt.post.view.exception.InvalidInputException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 
+@RestController
 public class PostController {
     private final PostService service;
-    private final InputView inputView;
-    private final OutputView outputView;
+//    private final InputView inputView;
+//    private final OutputView outputView;
 
     public PostController(PostService service,
-                           InputView inputView,
-                           OutputView outputView) {
+//                           InputView inputView,
+//                           OutputView outputView
+    ) {
         this.service = service;
-        this.inputView = inputView;
-        this.outputView = outputView;
+//        this.inputView = inputView;
+//        this.outputView = outputView;
     }
 
-    public void run() {
-        while (true) {
-            try {
-                outputView.printMenu();
-                outputView.printPrompt("선택: ");
-                int command = inputView.readCommand();
-
-                switch (command) {
-                    case 1 -> createPost();
-                    case 2 -> readPosts();
-                    case 3 -> readPost();
-                    case 4 -> updatePost();
-                    case 5 -> deletePost();
-                    case 6 -> {
-                        outputView.printMessage("프로그램을 종료합니다.");
-                        return;
-                    }
-                    default -> outputView.printMessage("잘못된 입력입니다.");
-                }
-            } catch (InvalidInputException | InvalidPostException | PostNotFoundException e) {
-                outputView.printMessage(e.getMessage());
-            } catch (InputClosedException e) {
-                outputView.printMessage("\n" + e.getMessage());
-                return;
-            }
-        }
-    }
+//    public void run() {
+//        while (true) {
+//            try {
+//                outputView.printMenu();
+//                outputView.printPrompt("선택: ");
+//                int command = inputView.readCommand();
+//
+//                switch (command) {
+//                    case 1 -> createPost();
+//                    case 2 -> readPosts();
+//                    case 3 -> readPost();
+//                    case 4 -> updatePost();
+//                    case 5 -> deletePost();
+//                    case 6 -> {
+//                        outputView.printMessage("프로그램을 종료합니다.");
+//                        return;
+//                    }
+//                    default -> outputView.printMessage("잘못된 입력입니다.");
+//                }
+//            } catch (InvalidInputException | InvalidPostException | PostNotFoundException e) {
+//                outputView.printMessage(e.getMessage());
+//            } catch (InputClosedException e) {
+//                outputView.printMessage("\n" + e.getMessage());
+//                return;
+//            }
+//        }
+//    }
 
     private void createPost() {
         while (true) {
@@ -124,15 +127,27 @@ public class PostController {
         }
     }
 
-    private void deletePost() {
-        if (service.isEmpty()) {
-            outputView.printMessage("게시글이 없습니다.");
-            return;
-        }
+//    private void deletePost() {
+//        if (service.isEmpty()) {
+//            outputView.printMessage("게시글이 없습니다.");
+//            return;
+//        }
+//
+//        outputView.printPrompt("삭제할 게시글 번호: ");
+//        int postNumber = inputView.readPostNumber();
+//        service.deletePost(postNumber);
+//        outputView.printMessage("게시글이 삭제되었습니다.");
+//    }
 
-        outputView.printPrompt("삭제할 게시글 번호: ");
-        int postNumber = inputView.readPostNumber();
-        service.deletePost(postNumber);
-        outputView.printMessage("게시글이 삭제되었습니다.");
+    @DeleteMapping(path = "/{postId}")
+    public ResponseEntity<?> deletePost(
+            @PathVariable(name = "postId") int postId
+    ) {
+        service.deletePost(postId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body("🗑 삭제 완료️");
+
     }
+
+
 }

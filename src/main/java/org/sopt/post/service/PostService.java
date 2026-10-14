@@ -1,15 +1,20 @@
-package org.sopt.service;
+package org.sopt.post.service;
 
-import org.sopt.domain.Post;
-import org.sopt.domain.PostCategory;
-import org.sopt.repository.PostRepository;
-import org.sopt.service.exception.InvalidPostException;
-import org.sopt.service.exception.PostNotFoundException;
+import org.sopt.post.domain.Post;
+import org.sopt.post.domain.PostCategory;
+import org.sopt.post.repository.PostRepository;
+import org.sopt.post.exception.InvalidPostException;
+import org.sopt.post.exception.PostNotFoundException;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+@Service
 public class PostService {
     private final PostRepository repository;
+    private long nextId = 1;
 
     public PostService(PostRepository repository) {
         this.repository = repository;
@@ -18,7 +23,7 @@ public class PostService {
     public void createPost(String title, String content, String author, PostCategory category) {
         validatePost(title, content, category);
         validateAuthor(author);
-        repository.add(new Post(title, content, author, category));
+        repository.add(new Post(title, content, author, category, nextId++));
     }
 
     public boolean isEmpty() {
@@ -44,6 +49,11 @@ public class PostService {
     }
 
     public void deletePost(int postNumber) {
+        Post post = PostRepository.findById(postNumber)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "게시글이 없습니다."
+                ));
+
         repository.remove(toIndex(postNumber));
     }
 
@@ -71,4 +81,11 @@ public class PostService {
         }
         return postNumber - 1;
     }
+
+//    private Post findPostOrThrow(int postNumber) {
+//        return PostRepository.findById(postNumber)
+//                .orElseThrow(() -> new ResponseStatusException(
+//                        HttpStatus.NOT_FOUND, "게시글이 없습니다"
+//                ));
+//    }
 }

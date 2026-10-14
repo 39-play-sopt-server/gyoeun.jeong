@@ -1,4 +1,4 @@
-package org.sopt.service.exception;
+package org.sopt.post.exception;
 
 public class InvalidPostException extends RuntimeException {
     public InvalidPostException(String message) {

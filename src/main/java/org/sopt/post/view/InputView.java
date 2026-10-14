@@ -1,9 +1,8 @@
-package org.sopt.view;
+package org.sopt.post.view;
 
-import org.sopt.domain.PostCategory;
-import org.sopt.view.exception.InputClosedException;
-import org.sopt.view.exception.InvalidInputException;
-
+import org.sopt.post.domain.PostCategory;
+import org.sopt.post.view.exception.InputClosedException;
+import org.sopt.post.view.exception.InvalidInputException;
 import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
