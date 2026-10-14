@@ -2,12 +2,11 @@ package org.sopt.post.service;
 
 import org.sopt.post.domain.Post;
 import org.sopt.post.domain.PostCategory;
-import org.sopt.post.repository.PostRepository;
 import org.sopt.post.exception.InvalidPostException;
+import org.sopt.post.exception.PostErrorMessage;
 import org.sopt.post.exception.PostNotFoundException;
-import org.springframework.http.HttpStatus;
+import org.sopt.post.repository.PostRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -42,7 +41,7 @@ public class PostService {
 
     public Post getPost(long postId) {
         return repository.findById(postId)
-            .orElseThrow(() -> new PostNotFoundException());
+                .orElseThrow(() -> new PostNotFoundException());
     }
 
     public void updatePost(long postId, String title, String content, PostCategory category) {
@@ -58,19 +57,19 @@ public class PostService {
 
     private void validatePost(String title, String content, PostCategory category) {
         if (title == null || title.isBlank()) {
-            throw new InvalidPostException("제목이 비어있어요!");
+            throw new InvalidPostException(PostErrorMessage.TITLE_REQUIRED);
         }
         if (content == null || content.isBlank()) {
-            throw new InvalidPostException("본문이 비어있어요!");
+            throw new InvalidPostException(PostErrorMessage.CONTENT_REQUIRED);
         }
         if (category == null) {
-            throw new InvalidPostException("카테고리를 선택해 주세요!");
+            throw new InvalidPostException(PostErrorMessage.CATEGORY_REQUIRED);
         }
     }
 
     private void validateAuthor(String author) {
         if (author == null || author.isBlank()) {
-            throw new InvalidPostException("작성자가 비어있어요!");
+            throw new InvalidPostException(PostErrorMessage.AUTHOR_REQUIRED);
         }
     }
 }
