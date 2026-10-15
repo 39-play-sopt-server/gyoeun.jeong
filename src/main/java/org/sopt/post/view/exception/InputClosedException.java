@@ -1,4 +1,4 @@
-package org.sopt.view.exception;
+package org.sopt.post.view.exception;
 
 public class InputClosedException extends RuntimeException {
     public InputClosedException(Throwable cause) {

@@ -1,4 +1,4 @@
-package org.sopt.domain;
+package org.sopt.post.domain;
 
 public enum PostCategory {
     FREE("자유"),

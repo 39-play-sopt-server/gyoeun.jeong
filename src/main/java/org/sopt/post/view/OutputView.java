@@ -1,8 +1,7 @@
-package org.sopt.view;
+package org.sopt.post.view;
 
-import org.sopt.domain.Post;
-import org.sopt.domain.PostCategory;
-
+import org.sopt.post.domain.Post;
+import org.sopt.post.domain.PostCategory;
 import java.util.List;
 
 public class OutputView {
