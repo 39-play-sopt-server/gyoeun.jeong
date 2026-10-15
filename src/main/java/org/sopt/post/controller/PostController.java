@@ -1,6 +1,7 @@
 package org.sopt.post.controller;
 
 import org.sopt.post.domain.Post;
+import org.sopt.post.domain.PostCategory;
 import org.sopt.post.dto.ApiResponse;
 import org.sopt.post.dto.CreatePostRequest;
 import org.sopt.post.dto.PostResponse;
@@ -36,8 +37,10 @@ public class PostController implements PostApi {
 
     @GetMapping
     @Override
-    public ApiResponse<List<PostResponse>> getPosts() {
-        List<PostResponse> posts = service.getPosts().stream()
+    public ApiResponse<List<PostResponse>> getPosts(
+            @RequestParam(required = false) PostCategory category
+    ) {
+        List<PostResponse> posts = service.getPosts(category).stream()
                 .map(PostResponse::from)
                 .toList();
         return ApiResponse.success(PostSuccessMessage.LISTED.getMessage(), posts);

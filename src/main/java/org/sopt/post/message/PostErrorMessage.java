@@ -7,7 +7,8 @@ public enum PostErrorMessage {
     CATEGORY_REQUIRED("카테고리를 선택해 주세요!"),
     AUTHOR_REQUIRED("작성자가 비어있어요!"),
     INVALID_REQUEST_BODY("본문 형식이나 카테고리 값을 확인해주세요!"),
-    INVALID_POST_ID("게시글 ID는 숫자로 입력해 주세요!");
+    INVALID_POST_ID("게시글 ID는 숫자로 입력해 주세요!"),
+    INVALID_CATEGORY("올바른 카테고리를 입력해 주세요!");
 
     private final String message;
 

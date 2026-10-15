@@ -31,7 +31,12 @@ public class PostExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ApiResponse<Void>> handleInvalidPostId() {
+    public ResponseEntity<ApiResponse<Void>> handleTypeMismatch(MethodArgumentTypeMismatchException e) {
+        PostErrorMessage errorMessage = "category".equals(e.getName())
+                ? PostErrorMessage.INVALID_CATEGORY
+                : PostErrorMessage.INVALID_POST_ID;
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.failure(PostErrorMessage.INVALID_POST_ID.getMessage()));    }
+                .body(ApiResponse.failure(errorMessage.getMessage()));
+    }
 }

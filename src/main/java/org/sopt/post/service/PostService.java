@@ -27,8 +27,11 @@ public class PostService {
         return post;
     }
 
-    public List<Post> getPosts() {
-        return repository.findAll();
+    public List<Post> getPosts(PostCategory category) {
+        if (category == null) {
+            return repository.findAll();
+        }
+        return repository.findByCategory(category);
     }
 
     public Post getPost(long postId) {

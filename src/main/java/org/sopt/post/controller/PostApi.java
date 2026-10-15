@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.sopt.post.domain.PostCategory;
 import org.sopt.post.dto.ApiResponse;
 import org.sopt.post.dto.CreatePostRequest;
 import org.sopt.post.dto.PostResponse;
@@ -21,9 +22,12 @@ public interface PostApi {
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class)))
     ApiResponse<PostResponse> createPost(CreatePostRequest request);
 
-    @Operation(summary = "게시글 목록 조회", description = "모든 게시글을 조회합니다.")
+    @Operation(summary = "게시글 목록 조회", description = "카테고리를 지정하면 해당 카테고리의 게시글만 조회합니다. 생략하면 전체 게시글을 조회합니다.")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공")
-    ApiResponse<List<PostResponse>> getPosts();
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "올바르지 않은 카테고리",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class)))
+    ApiResponse<List<PostResponse>> getPosts(
+            @Parameter(description = "조회할 카테고리", example = "FREE") PostCategory category);
 
     @Operation(summary = "게시글 상세 조회", description = "게시글을 조회하고 조회수를 1 증가시킵니다.")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공")
