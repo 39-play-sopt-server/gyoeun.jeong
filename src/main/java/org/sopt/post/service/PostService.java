@@ -27,10 +27,6 @@ public class PostService {
         return post;
     }
 
-    public boolean isEmpty() {
-        return repository.isEmpty();
-    }
-
     public List<Post> getPosts() {
         return repository.findAll();
     }
