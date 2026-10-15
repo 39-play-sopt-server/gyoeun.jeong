@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/posts")
-public class PostController {
+public class PostController implements PostApi {
     private final PostService service;
 
     public PostController(PostService service) {
@@ -23,6 +23,7 @@ public class PostController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Override
     public ApiResponse<PostResponse> createPost(@RequestBody CreatePostRequest request) {
         Post post = service.createPost(
                 request.title(),
@@ -34,6 +35,7 @@ public class PostController {
     }
 
     @GetMapping
+    @Override
     public ApiResponse<List<PostResponse>> getPosts() {
         List<PostResponse> posts = service.getPosts().stream()
                 .map(PostResponse::from)
@@ -42,12 +44,14 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
+    @Override
     public ApiResponse<PostResponse> getPost(@PathVariable long postId) {
         return ApiResponse.success(
                 PostSuccessMessage.FOUND.getMessage(), PostResponse.from(service.viewPost(postId)));
     }
 
     @PutMapping("/{postId}")
+    @Override
     public ApiResponse<Void> updatePost(
             @PathVariable long postId,
             @RequestBody UpdatePostRequest request
@@ -62,6 +66,7 @@ public class PostController {
     }
 
     @DeleteMapping(path = "/{postId}")
+    @Override
     public ApiResponse<Void> deletePost(
             @PathVariable(name = "postId") long postId
     ) {
