@@ -1,6 +1,7 @@
 package org.sopt.post.controller;
 
 import org.sopt.post.domain.Post;
+import org.sopt.post.dto.ApiResponse;
 import org.sopt.post.dto.CreatePostRequest;
 import org.sopt.post.dto.PostResponse;
 import org.sopt.post.dto.UpdatePostRequest;
@@ -21,31 +22,35 @@ public class PostController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public PostResponse createPost(@RequestBody CreatePostRequest request) {
+    public ApiResponse<PostResponse> createPost(@RequestBody CreatePostRequest request) {
         Post post = service.createPost(
                 request.title(),
                 request.content(),
                 request.author(),
                 request.category()
         );
-        return PostResponse.from(post);
+        return ApiResponse.success("게시글을 작성했어요.", PostResponse.from(post));
     }
 
     @GetMapping
-    public List<PostResponse> getPosts() {
-        return service.getPosts().stream()
+    public ApiResponse<List<PostResponse>> getPosts() {
+        List<PostResponse> posts = service.getPosts().stream()
                 .map(PostResponse::from)
                 .toList();
+        return ApiResponse.success("게시글 목록을 조회했어요.", posts);
     }
 
     @GetMapping("/{postId}")
-    public PostResponse getPost(@PathVariable long postId) {
-        return PostResponse.from(service.viewPost(postId));
+    public ApiResponse<PostResponse> getPost(@PathVariable long postId) {
+        return ApiResponse.success(
+                "게시글을 조회했어요.",
+                PostResponse.from(service.viewPost(postId))
+        );
     }
 
     @PutMapping("/{postId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updatePost(
+    public ApiResponse<Void> updatePost(
             @PathVariable long postId,
             @RequestBody UpdatePostRequest request
     ) {
@@ -55,13 +60,15 @@ public class PostController {
                 request.content(),
                 request.category()
         );
+        return ApiResponse.success("게시글을 수정했어요.", null);
     }
 
     @DeleteMapping(path = "/{postId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deletePost(
+    public ApiResponse<Void> deletePost(
             @PathVariable(name = "postId") long postId
     ) {
         service.deletePost(postId);
+        return ApiResponse.success("게시글을 삭제했어요.", null);
     }
 }
