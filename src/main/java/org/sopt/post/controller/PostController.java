@@ -5,6 +5,7 @@ import org.sopt.post.dto.ApiResponse;
 import org.sopt.post.dto.CreatePostRequest;
 import org.sopt.post.dto.PostResponse;
 import org.sopt.post.dto.UpdatePostRequest;
+import org.sopt.post.message.PostSuccessMessage;
 import org.sopt.post.service.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +30,7 @@ public class PostController {
                 request.author(),
                 request.category()
         );
-        return ApiResponse.success("게시글을 작성했어요.", PostResponse.from(post));
+        return ApiResponse.success(PostSuccessMessage.CREATED.getMessage(), PostResponse.from(post));
     }
 
     @GetMapping
@@ -37,15 +38,13 @@ public class PostController {
         List<PostResponse> posts = service.getPosts().stream()
                 .map(PostResponse::from)
                 .toList();
-        return ApiResponse.success("게시글 목록을 조회했어요.", posts);
+        return ApiResponse.success(PostSuccessMessage.LISTED.getMessage(), posts);
     }
 
     @GetMapping("/{postId}")
     public ApiResponse<PostResponse> getPost(@PathVariable long postId) {
         return ApiResponse.success(
-                "게시글을 조회했어요.",
-                PostResponse.from(service.viewPost(postId))
-        );
+                PostSuccessMessage.FOUND.getMessage(), PostResponse.from(service.viewPost(postId)));
     }
 
     @PutMapping("/{postId}")
@@ -60,7 +59,7 @@ public class PostController {
                 request.content(),
                 request.category()
         );
-        return ApiResponse.success("게시글을 수정했어요.", null);
+        return ApiResponse.success(PostSuccessMessage.UPDATED.getMessage(), null);
     }
 
     @DeleteMapping(path = "/{postId}")
@@ -69,6 +68,6 @@ public class PostController {
             @PathVariable(name = "postId") long postId
     ) {
         service.deletePost(postId);
-        return ApiResponse.success("게시글을 삭제했어요.", null);
+        return ApiResponse.success(PostSuccessMessage.DELETED.getMessage(), null);
     }
 }

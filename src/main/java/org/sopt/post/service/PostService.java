@@ -3,7 +3,7 @@ package org.sopt.post.service;
 import org.sopt.post.domain.Post;
 import org.sopt.post.domain.PostCategory;
 import org.sopt.post.exception.InvalidPostException;
-import org.sopt.post.exception.PostErrorMessage;
+import org.sopt.post.message.PostErrorMessage;
 import org.sopt.post.exception.PostNotFoundException;
 import org.sopt.post.repository.PostRepository;
 import org.springframework.stereotype.Service;

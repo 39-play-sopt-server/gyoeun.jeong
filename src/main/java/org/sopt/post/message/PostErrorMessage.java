@@ -1,4 +1,4 @@
-package org.sopt.post.exception;
+package org.sopt.post.message;
 
 public enum PostErrorMessage {
     POST_NOT_FOUND("게시글이 존재하지 않아요!"),
