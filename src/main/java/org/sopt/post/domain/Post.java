@@ -1,10 +1,13 @@
 package org.sopt.post.domain;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 public class Post {
     private String title;
     private String content;
     private final String author;
     private PostCategory category;
+    private final AtomicLong viewCount = new AtomicLong(0);
     private final long id;
 
     public Post(String title, String content, String author, PostCategory category, long id) {
@@ -29,6 +32,14 @@ public class Post {
 
     public PostCategory getCategory() {
         return category;
+    }
+
+    public long getViewCount() {
+        return viewCount.get();
+    }
+
+    public void increaseViewCount() {
+        viewCount.incrementAndGet();
     }
 
     public long getId() {

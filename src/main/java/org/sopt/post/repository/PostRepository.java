@@ -16,10 +16,6 @@ public class PostRepository {
         posts.put(post.getId(), post);
     }
 
-    public boolean isEmpty() {
-        return posts.isEmpty();
-    }
-
     public List<Post> findAll() {
         return List.copyOf(posts.values());
     }

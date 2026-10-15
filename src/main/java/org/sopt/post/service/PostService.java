@@ -31,13 +31,15 @@ public class PostService {
         return repository.findAll();
     }
 
-    public void ensurePostExists(long postId) {
-        getPost(postId);
-    }
-
     public Post getPost(long postId) {
         return repository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException());
+    }
+
+    public Post viewPost(long postId) {
+        Post post = getPost(postId);
+        post.increaseViewCount();
+        return post;
     }
 
     public void updatePost(long postId, String title, String content, PostCategory category) {
