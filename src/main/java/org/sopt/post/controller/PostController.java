@@ -48,7 +48,6 @@ public class PostController {
     }
 
     @PutMapping("/{postId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ApiResponse<Void> updatePost(
             @PathVariable long postId,
             @RequestBody UpdatePostRequest request
@@ -63,7 +62,6 @@ public class PostController {
     }
 
     @DeleteMapping(path = "/{postId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ApiResponse<Void> deletePost(
             @PathVariable(name = "postId") long postId
     ) {
