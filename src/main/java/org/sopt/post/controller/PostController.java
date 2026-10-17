@@ -1,9 +1,12 @@
 package org.sopt.post.controller;
 
 import org.sopt.post.domain.Post;
+import org.sopt.post.domain.PostCategory;
+import org.sopt.post.dto.ApiResponse;
 import org.sopt.post.dto.CreatePostRequest;
 import org.sopt.post.dto.PostResponse;
 import org.sopt.post.dto.UpdatePostRequest;
+import org.sopt.post.message.PostSuccessMessage;
 import org.sopt.post.service.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/posts")
-public class PostController {
+public class PostController implements PostApi {
     private final PostService service;
 
     public PostController(PostService service) {
@@ -21,31 +24,38 @@ public class PostController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public PostResponse createPost(@RequestBody CreatePostRequest request) {
+    @Override
+    public ApiResponse<PostResponse> createPost(@RequestBody CreatePostRequest request) {
         Post post = service.createPost(
                 request.title(),
                 request.content(),
                 request.author(),
                 request.category()
         );
-        return PostResponse.from(post);
+        return ApiResponse.success(PostSuccessMessage.CREATED.getMessage(), PostResponse.from(post));
     }
 
     @GetMapping
-    public List<PostResponse> getPosts() {
-        return service.getPosts().stream()
+    @Override
+    public ApiResponse<List<PostResponse>> getPosts(
+            @RequestParam(required = false) PostCategory category
+    ) {
+        List<PostResponse> posts = service.getPosts(category).stream()
                 .map(PostResponse::from)
                 .toList();
+        return ApiResponse.success(PostSuccessMessage.LISTED.getMessage(), posts);
     }
 
     @GetMapping("/{postId}")
-    public PostResponse getPost(@PathVariable long postId) {
-        return PostResponse.from(service.getPost(postId));
+    @Override
+    public ApiResponse<PostResponse> getPost(@PathVariable long postId) {
+        return ApiResponse.success(
+                PostSuccessMessage.FOUND.getMessage(), PostResponse.from(service.viewPost(postId)));
     }
 
     @PutMapping("/{postId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updatePost(
+    @Override
+    public ApiResponse<Void> updatePost(
             @PathVariable long postId,
             @RequestBody UpdatePostRequest request
     ) {
@@ -55,13 +65,15 @@ public class PostController {
                 request.content(),
                 request.category()
         );
+        return ApiResponse.success(PostSuccessMessage.UPDATED.getMessage(), null);
     }
 
     @DeleteMapping(path = "/{postId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deletePost(
+    @Override
+    public ApiResponse<Void> deletePost(
             @PathVariable(name = "postId") long postId
     ) {
         service.deletePost(postId);
+        return ApiResponse.success(PostSuccessMessage.DELETED.getMessage(), null);
     }
 }

@@ -1,6 +1,7 @@
 package org.sopt.post.repository;
 
 import org.sopt.post.domain.Post;
+import org.sopt.post.domain.PostCategory;
 import org.springframework.stereotype.Repository;
 
 import java.util.LinkedHashMap;
@@ -16,12 +17,14 @@ public class PostRepository {
         posts.put(post.getId(), post);
     }
 
-    public boolean isEmpty() {
-        return posts.isEmpty();
-    }
-
     public List<Post> findAll() {
         return List.copyOf(posts.values());
+    }
+
+    public List<Post> findByCategory(PostCategory category) {
+        return posts.values().stream()
+                .filter(post -> post.getCategory() == category)
+                .toList();
     }
 
     public Optional<Post> findById(long id) {

@@ -1,6 +1,7 @@
 package org.sopt.post.exception;
 
-import org.sopt.post.dto.ErrorResponse;
+import org.sopt.post.dto.ApiResponse;
+import org.sopt.post.message.PostErrorMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -12,26 +13,30 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 public class PostExceptionHandler {
 
     @ExceptionHandler(PostNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handlePostNotFound(PostNotFoundException e) {
+    public ResponseEntity<ApiResponse<Void>> handlePostNotFound(PostNotFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ErrorResponse(e.getMessage()));
+                .body(ApiResponse.failure(e.getMessage()));
     }
 
     @ExceptionHandler(InvalidPostException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidPost(InvalidPostException e) {
+    public ResponseEntity<ApiResponse<Void>> handleInvalidPost(InvalidPostException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponse(e.getMessage()));
+                .body(ApiResponse.failure(e.getMessage()));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponse> handleUnreadableBody() {
+    public ResponseEntity<ApiResponse<Void>> handleUnreadableBody() {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponse(PostErrorMessage.INVALID_REQUEST_BODY.getMessage()));
+                .body(ApiResponse.failure(PostErrorMessage.INVALID_REQUEST_BODY.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidPostId() {
+    public ResponseEntity<ApiResponse<Void>> handleTypeMismatch(MethodArgumentTypeMismatchException e) {
+        PostErrorMessage errorMessage = "category".equals(e.getName())
+                ? PostErrorMessage.INVALID_CATEGORY
+                : PostErrorMessage.INVALID_POST_ID;
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponse(PostErrorMessage.INVALID_POST_ID.getMessage()));
+                .body(ApiResponse.failure(errorMessage.getMessage()));
     }
 }

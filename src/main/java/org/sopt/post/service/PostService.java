@@ -3,7 +3,7 @@ package org.sopt.post.service;
 import org.sopt.post.domain.Post;
 import org.sopt.post.domain.PostCategory;
 import org.sopt.post.exception.InvalidPostException;
-import org.sopt.post.exception.PostErrorMessage;
+import org.sopt.post.message.PostErrorMessage;
 import org.sopt.post.exception.PostNotFoundException;
 import org.sopt.post.repository.PostRepository;
 import org.springframework.stereotype.Service;
@@ -27,21 +27,22 @@ public class PostService {
         return post;
     }
 
-    public boolean isEmpty() {
-        return repository.isEmpty();
-    }
-
-    public List<Post> getPosts() {
-        return repository.findAll();
-    }
-
-    public void ensurePostExists(long postId) {
-        getPost(postId);
+    public List<Post> getPosts(PostCategory category) {
+        if (category == null) {
+            return repository.findAll();
+        }
+        return repository.findByCategory(category);
     }
 
     public Post getPost(long postId) {
         return repository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException());
+    }
+
+    public Post viewPost(long postId) {
+        Post post = getPost(postId);
+        post.increaseViewCount();
+        return post;
     }
 
     public void updatePost(long postId, String title, String content, PostCategory category) {
