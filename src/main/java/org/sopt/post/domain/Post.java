@@ -1,21 +1,30 @@
 package org.sopt.post.domain;
 
-import java.util.concurrent.atomic.AtomicLong;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
+@Entity
 public class Post {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
     private String title;
     private String content;
-    private final String author;
+    private String author;
     private PostCategory category;
-    private final AtomicLong viewCount = new AtomicLong(0);
-    private final long id;
+    private Long viewCount = 0L;
 
-    public Post(String title, String content, String author, PostCategory category, long id) {
+
+    protected Post() {}
+
+    public Post(String title, String content, String author, PostCategory category) {
         this.title = title;
         this.content = content;
         this.author = author;
         this.category = category;
-        this.id = id;
     }
 
     public String getTitle() {
@@ -34,13 +43,9 @@ public class Post {
         return category;
     }
 
-    public long getViewCount() {
-        return viewCount.get();
-    }
+    public long getViewCount() { return viewCount; }
 
-    public void increaseViewCount() {
-        viewCount.incrementAndGet();
-    }
+    public void increaseViewCount() { viewCount++; }
 
     public long getId() {
         return id;
