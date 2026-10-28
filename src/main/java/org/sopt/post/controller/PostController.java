@@ -1,6 +1,5 @@
 package org.sopt.post.controller;
 
-import org.sopt.post.domain.Post;
 import org.sopt.post.domain.PostCategory;
 import org.sopt.common.dto.ApiResponse;
 import org.sopt.post.dto.CreatePostRequest;
@@ -26,13 +25,13 @@ public class PostController implements PostApi {
     @ResponseStatus(HttpStatus.CREATED)
     @Override
     public ApiResponse<PostResponse> createPost(@RequestBody CreatePostRequest request) {
-        Post post = service.createPost(
+        PostResponse post = service.createPost(
                 request.title(),
                 request.content(),
-                request.author(),
+                request.memberId(),
                 request.category()
         );
-        return ApiResponse.success(PostSuccessMessage.CREATED.getMessage(), PostResponse.from(post));
+        return ApiResponse.success(PostSuccessMessage.CREATED.getMessage(), post);
     }
 
     @GetMapping
@@ -40,9 +39,7 @@ public class PostController implements PostApi {
     public ApiResponse<List<PostResponse>> getPosts(
             @RequestParam(required = false) PostCategory category
     ) {
-        List<PostResponse> posts = service.getPosts(category).stream()
-                .map(PostResponse::from)
-                .toList();
+        List<PostResponse> posts = service.getPosts(category);
         return ApiResponse.success(PostSuccessMessage.LISTED.getMessage(), posts);
     }
 
@@ -50,7 +47,7 @@ public class PostController implements PostApi {
     @Override
     public ApiResponse<PostResponse> getPost(@PathVariable long postId) {
         return ApiResponse.success(
-                PostSuccessMessage.FOUND.getMessage(), PostResponse.from(service.viewPost(postId)));
+                PostSuccessMessage.FOUND.getMessage(), service.viewPost(postId));
     }
 
     @PutMapping("/{postId}")

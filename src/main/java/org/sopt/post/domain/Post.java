@@ -1,10 +1,15 @@
 package org.sopt.post.domain;
 
 import org.sopt.common.entity.BaseEntity;
+import org.sopt.member.domain.Member;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Post extends BaseEntity{
@@ -14,13 +19,18 @@ public class Post extends BaseEntity{
 
     private String title;
     private String content;
-    private String author;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "member_id", nullable = false,
+            foreignKey = @ForeignKey(name = "fk_post_member"))
+    private Member author;
+
     private PostCategory category;
     private Long viewCount = 0L;
 
     protected Post() {}
 
-    public Post(String title, String content, String author, PostCategory category) {
+    public Post(String title, String content, Member author, PostCategory category) {
         this.title = title;
         this.content = content;
         this.author = author;
@@ -35,7 +45,7 @@ public class Post extends BaseEntity{
         return this.content;
     }
 
-    public String getAuthor() {
+    public Member getAuthor() {
         return author;
     }
 

@@ -16,13 +16,15 @@ import java.util.List;
 @Tag(name = "게시글", description = "게시글 작성, 조회, 수정, 삭제 API")
 public interface PostApi {
 
-    @Operation(summary = "게시글 작성", description = "제목, 본문, 작성자, 카테고리로 게시글을 작성합니다.")
+    @Operation(summary = "게시글 작성", description = "제목, 본문, 활동 중인 회원의 memberId, 카테고리로 게시글을 작성합니다.")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "작성 성공")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "필수 값이 비어 있거나 요청 본문이 올바르지 않음",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class)))
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "회원이 없거나 이미 탈퇴함",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class)))
     ApiResponse<PostResponse> createPost(CreatePostRequest request);
 
-    @Operation(summary = "게시글 목록 조회", description = "카테고리를 지정하면 해당 카테고리의 게시글만 조회합니다. 생략하면 전체 게시글을 조회합니다.")
+    @Operation(summary = "게시글 목록 조회", description = "작성자 ID와 이름을 함께 반환합니다. 탈퇴한 작성자는 '탈퇴한 회원'으로 표시합니다. 카테고리를 지정하면 해당 카테고리의 게시글만 조회합니다.")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "올바르지 않은 카테고리",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class)))
