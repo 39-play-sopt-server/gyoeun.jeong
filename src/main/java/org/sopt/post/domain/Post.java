@@ -1,12 +1,13 @@
 package org.sopt.post.domain;
 
+import org.sopt.common.entity.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
-public class Post {
+public class Post extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -16,7 +17,6 @@ public class Post {
     private String author;
     private PostCategory category;
     private Long viewCount = 0L;
-
 
     protected Post() {}
 
