@@ -10,9 +10,4 @@ public enum PostCategory {
 
     PostCategory(String displayName) {
         this.displayName = displayName;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-}
+    }}
