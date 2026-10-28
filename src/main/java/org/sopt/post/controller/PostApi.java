@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.sopt.post.domain.PostCategory;
-import org.sopt.post.dto.ApiResponse;
+import org.sopt.common.dto.ApiResponse;
 import org.sopt.post.dto.CreatePostRequest;
 import org.sopt.post.dto.PostResponse;
 import org.sopt.post.dto.UpdatePostRequest;

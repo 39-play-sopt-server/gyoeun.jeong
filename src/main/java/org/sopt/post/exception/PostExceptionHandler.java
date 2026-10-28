@@ -1,6 +1,6 @@
 package org.sopt.post.exception;
 
-import org.sopt.post.dto.ApiResponse;
+import org.sopt.common.dto.ApiResponse;
 import org.sopt.post.message.PostErrorMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
