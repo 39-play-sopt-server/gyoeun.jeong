@@ -7,6 +7,7 @@ import org.sopt.post.message.PostErrorMessage;
 import org.sopt.post.exception.PostNotFoundException;
 import org.sopt.post.repository.PostRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -38,12 +39,14 @@ public class PostService {
                 .orElseThrow(() -> new PostNotFoundException());
     }
 
+    @Transactional
     public Post viewPost(long postId) {
         Post post = getPost(postId);
         post.increaseViewCount();
         return post;
     }
 
+    @Transactional
     public void updatePost(long postId, String title, String content, PostCategory category) {
         Post post = getPost(postId);
         validatePost(title, content, category);
