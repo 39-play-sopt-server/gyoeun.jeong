@@ -12,27 +12,12 @@ import java.util.Optional;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
-    private final Map<Long, Post> posts = new LinkedHashMap<>();
 
-    public void add(Post post) {
-        posts.put(post.getId(), post);
-    }
+    Optional<Post> findById(long id);
 
-    public List<Post> findAll() {
-        return List.copyOf(posts.values());
-    }
+    List<Post> findAll();
 
-    public List<Post> findByCategory(PostCategory category) {
-        return posts.values().stream()
-                .filter(post -> post.getCategory() == category)
-                .toList();
-    }
+    List<Post> findByCategory(PostCategory category);
 
-    public Optional<Post> findById(long id) {
-        return Optional.ofNullable(posts.get(id));
-    }
-
-    public void deleteById(long id) {
-        posts.remove(id);
-    }
+    void deleteById(long id);
 }

@@ -22,7 +22,7 @@ public class PostService {
         validatePost(title, content, category);
         validateAuthor(author);
         Post post = new Post(title, content, author, category);
-        repository.add(post);
+        repository.save(post);
         return post;
     }
 
