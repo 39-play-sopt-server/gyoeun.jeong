@@ -13,7 +13,6 @@ import java.util.List;
 @Service
 public class PostService {
     private final PostRepository repository;
-    private long nextId = 1;
 
     public PostService(PostRepository repository) {
         this.repository = repository;
@@ -22,7 +21,7 @@ public class PostService {
     public Post createPost(String title, String content, String author, PostCategory category) {
         validatePost(title, content, category);
         validateAuthor(author);
-        Post post = new Post(title, content, author, category, nextId++);
+        Post post = new Post(title, content, author, category);
         repository.add(post);
         return post;
     }
