@@ -6,28 +6,35 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.sopt.post.domain.PostCategory;
-import org.sopt.post.dto.ApiResponse;
+import org.sopt.common.dto.ApiResponse;
+import org.sopt.common.dto.PageResponse;
 import org.sopt.post.dto.CreatePostRequest;
 import org.sopt.post.dto.PostResponse;
 import org.sopt.post.dto.UpdatePostRequest;
 
-import java.util.List;
-
 @Tag(name = "게시글", description = "게시글 작성, 조회, 수정, 삭제 API")
 public interface PostApi {
 
-    @Operation(summary = "게시글 작성", description = "제목, 본문, 작성자, 카테고리로 게시글을 작성합니다.")
+    @Operation(summary = "게시글 작성", description = "제목, 본문, 활동 중인 회원의 memberId, 카테고리로 게시글을 작성합니다.")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "작성 성공")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "필수 값이 비어 있거나 요청 본문이 올바르지 않음",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class)))
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "회원이 없거나 이미 탈퇴함",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class)))
     ApiResponse<PostResponse> createPost(CreatePostRequest request);
 
-    @Operation(summary = "게시글 목록 조회", description = "카테고리를 지정하면 해당 카테고리의 게시글만 조회합니다. 생략하면 전체 게시글을 조회합니다.")
+    @Operation(summary = "게시글 목록 조회", description = "생성일 내림차순, 같은 생성일에서는 ID 내림차순으로 페이지 조회합니다. "
+            + "작성자 ID와 이름, 생성일, 전체 글 수와 페이지 정보를 반환합니다. 탈퇴한 작성자는 '탈퇴한 회원'으로 표시합니다. "
+            + "카테고리를 지정하면 해당 카테고리 안에서 조회하고 전체 개수를 계산합니다. 결과가 없거나 마지막 페이지를 넘으면 빈 목록을 반환합니다.")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "올바르지 않은 카테고리",
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "카테고리 또는 페이지 요청값이 올바르지 않거나 조회 시작 위치가 JPA 지원 범위를 초과함",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class)))
-    ApiResponse<List<PostResponse>> getPosts(
-            @Parameter(description = "조회할 카테고리", example = "FREE") PostCategory category);
+    ApiResponse<PageResponse<PostResponse>> getPosts(
+            @Parameter(description = "조회할 카테고리", example = "FREE") PostCategory category,
+            @Parameter(description = "0부터 시작하는 페이지 번호, 기본값 0", example = "0",
+                    schema = @Schema(minimum = "0", defaultValue = "0")) int page,
+            @Parameter(description = "페이지 크기, 기본값 10, 허용 범위 1~100", example = "10",
+                    schema = @Schema(minimum = "1", maximum = "100", defaultValue = "10")) int size);
 
     @Operation(summary = "게시글 상세 조회", description = "게시글을 조회하고 조회수를 1 증가시킵니다.")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "조회 성공")
