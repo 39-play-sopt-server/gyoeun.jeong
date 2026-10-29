@@ -16,6 +16,12 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(InvalidPaginationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInvalidPagination(InvalidPaginationException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.failure(e.getMessage()));
+    }
+
     @ExceptionHandler(InvalidMemberException.class)
     public ResponseEntity<ApiResponse<Void>> handleInvalidMember(InvalidMemberException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)

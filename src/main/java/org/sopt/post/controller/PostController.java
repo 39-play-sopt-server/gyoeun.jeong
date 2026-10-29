@@ -2,6 +2,7 @@ package org.sopt.post.controller;
 
 import org.sopt.post.domain.PostCategory;
 import org.sopt.common.dto.ApiResponse;
+import org.sopt.common.dto.PageResponse;
 import org.sopt.post.dto.CreatePostRequest;
 import org.sopt.post.dto.PostResponse;
 import org.sopt.post.dto.UpdatePostRequest;
@@ -9,8 +10,6 @@ import org.sopt.post.message.PostSuccessMessage;
 import org.sopt.post.service.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/posts")
@@ -36,10 +35,12 @@ public class PostController implements PostApi {
 
     @GetMapping
     @Override
-    public ApiResponse<List<PostResponse>> getPosts(
-            @RequestParam(required = false) PostCategory category
+    public ApiResponse<PageResponse<PostResponse>> getPosts(
+            @RequestParam(name = "category", required = false) PostCategory category,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-        List<PostResponse> posts = service.getPosts(category);
+        PageResponse<PostResponse> posts = PageResponse.from(service.getPosts(category, page, size));
         return ApiResponse.success(PostSuccessMessage.LISTED.getMessage(), posts);
     }
 
