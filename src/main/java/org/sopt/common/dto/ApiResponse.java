@@ -1,4 +1,4 @@
-package org.sopt.post.dto;
+package org.sopt.common.dto;
 
 public record  ApiResponse<T>(
         boolean success,
