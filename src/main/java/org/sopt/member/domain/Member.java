@@ -19,6 +19,12 @@ public class Member extends BaseEntity {
     @Column(nullable = false, length = 50)
     private String name;
 
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(nullable = false)
+    private String password;
+
     private LocalDateTime deletedAt;
 
     protected Member() {
@@ -26,6 +32,12 @@ public class Member extends BaseEntity {
 
     public Member(String name) {
         this.name = name;
+    }
+
+    public Member(String name, String email, String password) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
     }
 
     public Long getId() {
@@ -47,5 +59,9 @@ public class Member extends BaseEntity {
     public void withdraw() {
         this.deletedAt = LocalDateTime.now();
         this.name = "탈퇴한 회원";
+    }
+
+    public String getPassword() {
+        return password;
     }
 }
