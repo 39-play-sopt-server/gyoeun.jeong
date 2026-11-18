@@ -1,5 +1,7 @@
 package org.sopt.auth;
 
+import org.sopt.auth.exception.DuplicateEmailException;
+import org.sopt.auth.exception.InvalidCredentialsException;
 import org.sopt.auth.jwt.JwtProvider;
 import org.sopt.member.domain.Member;
 import org.sopt.member.repository.MemberRepository;
@@ -27,7 +29,7 @@ public class AuthService {
     @Transactional
     public Long signup(String name, String email, String password) {
         if (memberRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("이미 가입된 이메일입니다.");
+            throw new DuplicateEmailException();
         }
 
         Member member = new Member(name, email, passwordEncoder.encode(password));
@@ -37,12 +39,10 @@ public class AuthService {
     @Transactional(readOnly = true)
     public String login(String email, String password) {
         Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "이메일 또는 비밀번호가 올바르지 않습니다."
-                ));
+                .orElseThrow(InvalidCredentialsException::new);
 
         if (!passwordEncoder.matches(password, member.getPassword())) {
-            throw new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다.");
+            throw new InvalidCredentialsException();
         }
 
         return jwtProvider.createAccessToken(member.getId());

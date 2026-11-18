@@ -1,5 +1,7 @@
 package org.sopt.common.exception;
 
+import org.sopt.auth.exception.DuplicateEmailException;
+import org.sopt.auth.exception.InvalidCredentialsException;
 import org.sopt.common.dto.ApiResponse;
 import org.sopt.common.message.CommonErrorMessage;
 import org.sopt.member.exception.InvalidMemberException;
@@ -15,6 +17,18 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(DuplicateEmailException.class)
+    public ResponseEntity<ApiResponse<Void>> handleDuplicateEmail(DuplicateEmailException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.failure(e.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInvalidCredentials(InvalidCredentialsException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.failure(e.getMessage()));
+    }
 
     @ExceptionHandler(InvalidPaginationException.class)
     public ResponseEntity<ApiResponse<Void>> handleInvalidPagination(InvalidPaginationException e) {

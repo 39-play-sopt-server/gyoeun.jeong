@@ -6,9 +6,8 @@ import org.sopt.member.dto.MemberResponse;
 import org.sopt.member.message.MemberSuccessMessage;
 import org.sopt.member.service.MemberService;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/members")
@@ -46,7 +45,7 @@ public class MemberController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<Long> me(@AuthenticationPrincipal Long memberId) {
-        return ResponseEntity.ok(memberId);
+    public ApiResponse<Long> me(@AuthenticationPrincipal Long memberId) {
+        return ApiResponse.success(MemberSuccessMessage.RETRIEVED.getMessage(), memberId);
     }
 }
