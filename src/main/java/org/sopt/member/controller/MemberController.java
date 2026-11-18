@@ -6,6 +6,7 @@ import org.sopt.member.dto.MemberResponse;
 import org.sopt.member.message.MemberSuccessMessage;
 import org.sopt.member.service.MemberService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -41,5 +42,10 @@ public class MemberController {
                 MemberSuccessMessage.DELETED.getMessage(),
                 null
         );
+    }
+
+    @GetMapping("/me")
+    public ApiResponse<Long> me(@AuthenticationPrincipal Long memberId) {
+        return ApiResponse.success(MemberSuccessMessage.RETRIEVED.getMessage(), memberId);
     }
 }
