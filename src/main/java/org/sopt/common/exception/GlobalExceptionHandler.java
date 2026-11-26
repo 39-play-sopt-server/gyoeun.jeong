@@ -3,6 +3,7 @@ package org.sopt.common.exception;
 import org.sopt.auth.exception.DuplicateEmailException;
 import org.sopt.auth.exception.InvalidCredentialsException;
 import org.sopt.auth.exception.InvalidRefreshTokenException;
+import org.sopt.auth.exception.InvalidSignupException;
 import org.sopt.common.dto.ApiResponse;
 import org.sopt.common.message.CommonErrorMessage;
 import org.sopt.member.exception.InvalidMemberException;
@@ -18,6 +19,12 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(InvalidSignupException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInvalidSignup(InvalidSignupException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.failure(e.getMessage()));
+    }
 
     @ExceptionHandler(InvalidRefreshTokenException.class)
     public ResponseEntity<ApiResponse<Void>> handleInvalidRefreshToken(InvalidRefreshTokenException e) {

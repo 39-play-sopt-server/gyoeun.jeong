@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -36,6 +37,21 @@ class JwtAuthenticationFilterTest {
         assertEquals(1L, authenticate(token));
         SecurityContextHolder.clearContext();
         assertNull(authenticate(token));
+    }
+
+    @Test
+    void propagatesDownstreamExceptionWithoutCallingChainAgain() {
+        String token = jwt.createAccessToken(1L, "session-1");
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addHeader("Authorization", "Bearer " + token);
+        AtomicInteger calls = new AtomicInteger();
+
+        assertThrows(IllegalArgumentException.class, () -> filter.doFilter(
+                request, new MockHttpServletResponse(), (req, res) -> {
+                    calls.incrementAndGet();
+                    throw new IllegalArgumentException("downstream failure");
+                }));
+        assertEquals(1, calls.get());
     }
 
     private Object authenticate(String token) throws Exception {

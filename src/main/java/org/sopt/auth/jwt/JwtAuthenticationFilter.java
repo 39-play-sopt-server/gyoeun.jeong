@@ -38,20 +38,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = resolveToken(request);
 
         if (token != null) {
+            JwtProvider.AccessIdentity identity = null;
             try {
-                JwtProvider.AccessIdentity identity = jwtProvider.getAccessIdentity(token);
-                Long memberId = identity.memberId();
-                if (!refreshTokenRepository.existsBySessionIdAndMemberId(identity.sessionId(), memberId)
-                        || memberRepository.findByIdAndDeletedAtIsNull(memberId).isEmpty()) {
-                    filterChain.doFilter(request, response);
-                    return;
-                }
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(memberId, null, List.of());
-                authentication.setDetails(identity.sessionId());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                identity = jwtProvider.getAccessIdentity(token);
             } catch (JwtException | IllegalArgumentException e) {
                 // 유효하지 않은 토큰은 인증 정보로 저장하지 않습니다.
+            }
+
+            if (identity != null) {
+                Long memberId = identity.memberId();
+                if (refreshTokenRepository.existsBySessionIdAndMemberId(identity.sessionId(), memberId)
+                        && memberRepository.findByIdAndDeletedAtIsNull(memberId).isPresent()) {
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(memberId, null, List.of());
+                    authentication.setDetails(identity.sessionId());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
             }
         }
 
