@@ -2,12 +2,15 @@ package org.sopt.common.exception;
 
 import org.sopt.auth.exception.DuplicateEmailException;
 import org.sopt.auth.exception.InvalidCredentialsException;
+import org.sopt.auth.exception.InvalidRefreshTokenException;
+import org.sopt.auth.exception.InvalidSignupException;
 import org.sopt.common.dto.ApiResponse;
 import org.sopt.common.message.CommonErrorMessage;
 import org.sopt.member.exception.InvalidMemberException;
 import org.sopt.member.exception.MemberNotFoundException;
 import org.sopt.post.exception.InvalidPostException;
 import org.sopt.post.exception.PostNotFoundException;
+import org.sopt.post.exception.PostForbiddenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -17,6 +20,24 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(PostForbiddenException.class)
+    public ResponseEntity<ApiResponse<Void>> handlePostForbidden(PostForbiddenException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.failure(e.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidSignupException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInvalidSignup(InvalidSignupException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.failure(e.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidRefreshTokenException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInvalidRefreshToken(InvalidRefreshTokenException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.failure(e.getMessage()));
+    }
 
     @ExceptionHandler(DuplicateEmailException.class)
     public ResponseEntity<ApiResponse<Void>> handleDuplicateEmail(DuplicateEmailException e) {

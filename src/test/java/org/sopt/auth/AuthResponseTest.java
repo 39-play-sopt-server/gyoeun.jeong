@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.access.AccessDeniedException;
 import tools.jackson.databind.ObjectMapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,5 +47,16 @@ class AuthResponseTest {
         assertEquals(HttpStatus.UNAUTHORIZED, invalid.getStatusCode());
         assertFalse(invalid.getBody().success());
         assertEquals("이메일 또는 비밀번호가 올바르지 않습니다.", invalid.getBody().message());
+    }
+
+    @Test
+    void deniedAccessReturnsForbiddenApiResponse() throws Exception {
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        new ApiAccessDeniedHandler(new ObjectMapper()).handle(new MockHttpServletRequest(), response,
+                new AccessDeniedException("denied"));
+        var body = new ObjectMapper().readTree(response.getContentAsString());
+        assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
+        assertFalse(body.get("success").booleanValue());
+        assertEquals("접근 권한이 없습니다.", body.get("message").asString());
     }
 }

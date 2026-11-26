@@ -193,7 +193,7 @@ class PostPaginationTest {
     }
 
     private List<Post> posts(int count) {
-        Member author = new Member("교은");
+        Member author = new Member("교은", "user@example.com", "encoded-password");
         ReflectionTestUtils.setField(author, "id", 1L);
         return IntStream.range(0, count).mapToObj(index -> {
             Post post = new Post("게시글 " + index, "본문", author, PostCategory.FREE);

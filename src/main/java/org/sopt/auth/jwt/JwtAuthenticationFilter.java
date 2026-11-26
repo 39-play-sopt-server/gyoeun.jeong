@@ -8,7 +8,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.sopt.auth.repository.RefreshTokenRepository;
+import org.sopt.member.repository.MemberRepository;
+import org.sopt.member.domain.Member;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,9 +22,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String BEARER_PREFIX = "Bearer ";
 
     private final JwtProvider jwtProvider;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final MemberRepository memberRepository;
 
-    public JwtAuthenticationFilter(JwtProvider jwtProvider) {
+    public JwtAuthenticationFilter(JwtProvider jwtProvider, RefreshTokenRepository refreshTokenRepository, MemberRepository memberRepository) {
         this.jwtProvider = jwtProvider;
+        this.refreshTokenRepository = refreshTokenRepository;
+        this.memberRepository = memberRepository;
     }
 
     @Override
@@ -32,13 +40,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = resolveToken(request);
 
         if (token != null) {
+            JwtProvider.AccessIdentity identity = null;
             try {
-                Long memberId = jwtProvider.getMemberId(token);
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(memberId, null, List.of());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                identity = jwtProvider.getAccessIdentity(token);
             } catch (JwtException | IllegalArgumentException e) {
                 // 유효하지 않은 토큰은 인증 정보로 저장하지 않습니다.
+            }
+
+            if (identity != null) {
+                Long memberId = identity.memberId();
+                if (refreshTokenRepository.existsBySessionIdAndMemberId(identity.sessionId(), memberId)) {
+                    Member member = memberRepository.findByIdAndDeletedAtIsNull(memberId).orElse(null);
+                    if (member != null) {
+                        UsernamePasswordAuthenticationToken authentication =
+                                new UsernamePasswordAuthenticationToken(memberId, null,
+                                        List.of(new SimpleGrantedAuthority(member.getRole().name())));
+                        authentication.setDetails(identity.sessionId());
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
+                }
             }
         }
 

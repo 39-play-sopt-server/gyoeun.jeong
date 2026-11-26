@@ -2,9 +2,8 @@ package org.sopt.member.message;
 
 public enum MemberSuccessMessage {
 
-    CREATED("회원을 생성했어요."),
-    DELETED("회원 탈퇴가 완료됐어요."),
-    RETRIEVED("회원 정보를 조회했어요.");
+    RETRIEVED("회원 정보를 조회했어요."),
+    LISTED("회원 목록을 조회했어요.");
 
     private final String message;
 

@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import org.sopt.common.entity.BaseEntity;
 
 import java.time.LocalDateTime;
@@ -25,13 +27,13 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private String password;
 
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private MemberRole role = MemberRole.ROLE_USER;
+
     private LocalDateTime deletedAt;
 
     protected Member() {
-    }
-
-    public Member(String name) {
-        this.name = name;
     }
 
     public Member(String name, String email, String password) {
@@ -46,6 +48,14 @@ public class Member extends BaseEntity {
 
     public String getName() {
         return name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public MemberRole getRole() {
+        return role == null ? MemberRole.ROLE_USER : role;
     }
 
     public LocalDateTime getDeletedAt() {
