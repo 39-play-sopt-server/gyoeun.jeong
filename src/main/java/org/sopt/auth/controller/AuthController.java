@@ -1,9 +1,10 @@
-package org.sopt.auth;
+package org.sopt.auth.controller;
 
 import org.sopt.auth.dto.LoginRequest;
 import org.sopt.auth.dto.SignupRequest;
 import org.sopt.auth.dto.TokenPair;
 import org.sopt.auth.message.AuthSuccessMessage;
+import org.sopt.auth.service.AuthService;
 import org.sopt.common.dto.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpHeaders;

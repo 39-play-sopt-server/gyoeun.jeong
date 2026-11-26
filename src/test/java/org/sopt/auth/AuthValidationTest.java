@@ -5,6 +5,7 @@ import org.sopt.auth.exception.InvalidCredentialsException;
 import org.sopt.auth.exception.InvalidSignupException;
 import org.sopt.auth.jwt.JwtProvider;
 import org.sopt.auth.repository.RefreshTokenRepository;
+import org.sopt.auth.service.AuthService;
 import org.sopt.common.exception.GlobalExceptionHandler;
 import org.sopt.member.repository.MemberRepository;
 import org.springframework.http.HttpStatus;

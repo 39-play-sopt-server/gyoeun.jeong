@@ -6,6 +6,7 @@ import org.sopt.auth.dto.TokenPair;
 import org.sopt.auth.exception.InvalidRefreshTokenException;
 import org.sopt.auth.jwt.JwtProvider;
 import org.sopt.auth.repository.RefreshTokenRepository;
+import org.sopt.auth.service.AuthService;
 import org.sopt.member.domain.Member;
 import org.sopt.member.repository.MemberRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;

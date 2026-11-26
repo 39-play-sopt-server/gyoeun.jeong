@@ -1,4 +1,4 @@
-package org.sopt.auth;
+package org.sopt.auth.service;
 
 import org.sopt.auth.exception.DuplicateEmailException;
 import org.sopt.auth.exception.InvalidCredentialsException;
