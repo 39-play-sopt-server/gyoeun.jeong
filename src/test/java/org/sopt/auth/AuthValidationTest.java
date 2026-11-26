@@ -6,6 +6,7 @@ import org.sopt.auth.exception.InvalidSignupException;
 import org.sopt.auth.jwt.JwtProvider;
 import org.sopt.auth.repository.RefreshTokenRepository;
 import org.sopt.auth.service.AuthService;
+import org.sopt.auth.service.TokenService;
 import org.sopt.common.exception.GlobalExceptionHandler;
 import org.sopt.member.repository.MemberRepository;
 import org.springframework.http.HttpStatus;
@@ -18,8 +19,8 @@ import static org.mockito.Mockito.*;
 class AuthValidationTest {
     private final MemberRepository members = mock(MemberRepository.class);
     private final AuthService service = new AuthService(members, mock(PasswordEncoder.class),
-            new JwtProvider(Base64.getEncoder().encodeToString(new byte[32]), 1800000, 604800000),
-            mock(RefreshTokenRepository.class), 604800000);
+            new TokenService(new JwtProvider(Base64.getEncoder().encodeToString(new byte[32]), 1800000, 604800000),
+                    mock(RefreshTokenRepository.class), members, 604800000));
 
     @Test
     void rejectsInvalidSignupBeforeAccessingDatabase() {
