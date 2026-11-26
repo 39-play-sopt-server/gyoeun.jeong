@@ -8,9 +8,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.sopt.auth.repository.RefreshTokenRepository;
 import org.sopt.member.repository.MemberRepository;
+import org.sopt.member.domain.Member;
 
 import java.io.IOException;
 import java.util.List;
@@ -47,12 +49,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (identity != null) {
                 Long memberId = identity.memberId();
-                if (refreshTokenRepository.existsBySessionIdAndMemberId(identity.sessionId(), memberId)
-                        && memberRepository.findByIdAndDeletedAtIsNull(memberId).isPresent()) {
-                    UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(memberId, null, List.of());
-                    authentication.setDetails(identity.sessionId());
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                if (refreshTokenRepository.existsBySessionIdAndMemberId(identity.sessionId(), memberId)) {
+                    Member member = memberRepository.findByIdAndDeletedAtIsNull(memberId).orElse(null);
+                    if (member != null) {
+                        UsernamePasswordAuthenticationToken authentication =
+                                new UsernamePasswordAuthenticationToken(memberId, null,
+                                        List.of(new SimpleGrantedAuthority(member.getRole().name())));
+                        authentication.setDetails(identity.sessionId());
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
                 }
             }
         }

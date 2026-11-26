@@ -4,10 +4,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.sopt.auth.repository.RefreshTokenRepository;
 import org.sopt.member.domain.Member;
+import org.sopt.member.domain.MemberRole;
 import org.sopt.member.repository.MemberRepository;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Base64;
 import java.util.Optional;
@@ -52,6 +54,21 @@ class JwtAuthenticationFilterTest {
                     throw new IllegalArgumentException("downstream failure");
                 }));
         assertEquals(1, calls.get());
+    }
+
+    @Test
+    void appliesCurrentMemberRoleOnEachRequest() throws Exception {
+        Member member = new Member("이름", "a@b.com", "pw");
+        when(sessions.existsBySessionIdAndMemberId("session-1", 1L)).thenReturn(true);
+        when(members.findByIdAndDeletedAtIsNull(1L)).thenReturn(Optional.of(member));
+        String token = jwt.createAccessToken(1L, "session-1");
+
+        authenticate(token);
+        assertEquals("ROLE_USER", SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority());
+        SecurityContextHolder.clearContext();
+        ReflectionTestUtils.setField(member, "role", MemberRole.ROLE_ADMIN);
+        authenticate(token);
+        assertEquals("ROLE_ADMIN", SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority());
     }
 
     private Object authenticate(String token) throws Exception {
