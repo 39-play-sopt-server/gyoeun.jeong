@@ -9,6 +9,7 @@ import org.sopt.post.dto.UpdatePostRequest;
 import org.sopt.post.message.PostSuccessMessage;
 import org.sopt.post.service.PostService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,11 +24,12 @@ public class PostController implements PostApi {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Override
-    public ApiResponse<PostResponse> createPost(@RequestBody CreatePostRequest request) {
+    public ApiResponse<PostResponse> createPost(@RequestBody CreatePostRequest request,
+                                                @AuthenticationPrincipal Long memberId) {
         PostResponse post = service.createPost(
                 request.title(),
                 request.content(),
-                request.memberId(),
+                memberId,
                 request.category()
         );
         return ApiResponse.success(PostSuccessMessage.CREATED.getMessage(), post);
@@ -55,10 +57,12 @@ public class PostController implements PostApi {
     @Override
     public ApiResponse<Void> updatePost(
             @PathVariable long postId,
-            @RequestBody UpdatePostRequest request
+            @RequestBody UpdatePostRequest request,
+            @AuthenticationPrincipal Long memberId
     ) {
         service.updatePost(
                 postId,
+                memberId,
                 request.title(),
                 request.content(),
                 request.category()
@@ -69,9 +73,10 @@ public class PostController implements PostApi {
     @DeleteMapping(path = "/{postId}")
     @Override
     public ApiResponse<Void> deletePost(
-            @PathVariable(name = "postId") long postId
+            @PathVariable(name = "postId") long postId,
+            @AuthenticationPrincipal Long memberId
     ) {
-        service.deletePost(postId);
+        service.deletePost(postId, memberId);
         return ApiResponse.success(PostSuccessMessage.DELETED.getMessage(), null);
     }
 }

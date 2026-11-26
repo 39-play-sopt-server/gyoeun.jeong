@@ -10,6 +10,7 @@ import org.sopt.member.exception.InvalidMemberException;
 import org.sopt.member.exception.MemberNotFoundException;
 import org.sopt.post.exception.InvalidPostException;
 import org.sopt.post.exception.PostNotFoundException;
+import org.sopt.post.exception.PostForbiddenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -19,6 +20,12 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(PostForbiddenException.class)
+    public ResponseEntity<ApiResponse<Void>> handlePostForbidden(PostForbiddenException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.failure(e.getMessage()));
+    }
 
     @ExceptionHandler(InvalidSignupException.class)
     public ResponseEntity<ApiResponse<Void>> handleInvalidSignup(InvalidSignupException e) {
