@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.security.core.Authentication;
 import java.time.Duration;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("/auth")
@@ -59,12 +60,14 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<ApiResponse<Void>> logout(Authentication authentication) {
         authService.logout((Long) authentication.getPrincipal(), (String) authentication.getDetails());
         return clearCookieResponse(AuthSuccessMessage.LOGGED_OUT.getMessage());
     }
 
     @DeleteMapping("/withdraw")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<ApiResponse<Void>> withdraw(Authentication authentication) {
         authService.withdraw((Long) authentication.getPrincipal());
         return clearCookieResponse(AuthSuccessMessage.WITHDRAWN.getMessage());

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("/members")
@@ -21,11 +22,13 @@ public class MemberController {
     }
 
     @GetMapping
+    @SecurityRequirement(name = "bearerAuth")
     public ApiResponse<List<MemberListResponse>> getMembers() {
         return ApiResponse.success(MemberSuccessMessage.LISTED.getMessage(), service.getMembers());
     }
 
     @GetMapping("/me")
+    @SecurityRequirement(name = "bearerAuth")
     public ApiResponse<Long> me(@AuthenticationPrincipal Long memberId) {
         return ApiResponse.success(MemberSuccessMessage.RETRIEVED.getMessage(), memberId);
     }

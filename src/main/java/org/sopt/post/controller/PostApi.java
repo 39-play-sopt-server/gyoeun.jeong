@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.sopt.post.domain.PostCategory;
 import org.sopt.common.dto.ApiResponse;
 import org.sopt.common.dto.PageResponse;
@@ -16,6 +17,7 @@ import org.sopt.post.dto.UpdatePostRequest;
 public interface PostApi {
 
     @Operation(summary = "게시글 작성", description = "로그인한 회원이 제목, 본문, 카테고리로 게시글을 작성합니다.")
+    @SecurityRequirement(name = "bearerAuth")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "작성 성공")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "필수 값이 비어 있거나 요청 본문이 올바르지 않음",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class)))
@@ -45,6 +47,7 @@ public interface PostApi {
     ApiResponse<PostResponse> getPost(@Parameter(description = "게시글 ID", example = "1") long postId);
 
     @Operation(summary = "게시글 수정", description = "작성자 본인의 게시글을 수정합니다. 제목, 본문, 카테고리 모두 필수입니다.")
+    @SecurityRequirement(name = "bearerAuth")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "수정 성공")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "게시글 ID 또는 요청 본문이 올바르지 않음",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class)))
@@ -55,6 +58,7 @@ public interface PostApi {
                                  UpdatePostRequest request, @Parameter(hidden = true) Long memberId);
 
     @Operation(summary = "게시글 삭제", description = "작성자 본인의 게시글을 삭제합니다.")
+    @SecurityRequirement(name = "bearerAuth")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "삭제 성공")
     @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "게시글 ID가 숫자가 아님",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResponse.class)))
