@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.security.core.Authentication;
 import java.time.Duration;
 
 @RestController
@@ -55,17 +57,39 @@ public class AuthController {
         return tokenResponse(authService.reissue(refreshToken), AuthSuccessMessage.TOKEN_REISSUED.getMessage());
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(Authentication authentication) {
+        authService.logout((Long) authentication.getPrincipal(), (String) authentication.getDetails());
+        return clearCookieResponse(AuthSuccessMessage.LOGGED_OUT.getMessage());
+    }
+
+    @DeleteMapping("/withdraw")
+    public ResponseEntity<ApiResponse<Void>> withdraw(Authentication authentication) {
+        authService.withdraw((Long) authentication.getPrincipal());
+        return clearCookieResponse(AuthSuccessMessage.WITHDRAWN.getMessage());
+    }
+
+    private ResponseEntity<ApiResponse<Void>> clearCookieResponse(String message) {
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshCookie("", Duration.ZERO).toString())
+                .body(ApiResponse.success(message, null));
+    }
+
     private ResponseEntity<ApiResponse<Void>> tokenResponse(TokenPair tokens, String message) {
-        ResponseCookie cookie = ResponseCookie.from("refreshToken", tokens.refreshToken())
-                .httpOnly(true)
-                .secure(cookieSecure)
-                .sameSite("Strict")
-                .path("/auth")
-                .maxAge(Duration.ofMillis(refreshTokenExpiration))
-                .build();
+        ResponseCookie cookie = refreshCookie(tokens.refreshToken(), Duration.ofMillis(refreshTokenExpiration));
         return ResponseEntity.ok()
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokens.accessToken())
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(ApiResponse.success(message, null));
+    }
+
+    private ResponseCookie refreshCookie(String value, Duration maxAge) {
+        return ResponseCookie.from("refreshToken", value)
+                .httpOnly(true)
+                .secure(cookieSecure)
+                .sameSite("Strict")
+                .path("/auth")
+                .maxAge(maxAge)
+                .build();
     }
 }

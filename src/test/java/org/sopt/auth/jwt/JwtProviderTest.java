@@ -16,7 +16,7 @@ class JwtProviderTest {
 
     @Test
     void tokensContainMemberIdAndCannotBeUsedAsAnotherType() {
-        String access = provider.createAccessToken(1L);
+        String access = provider.createAccessToken(1L, "session-1");
         String refresh = provider.createRefreshToken(1L);
 
         assertEquals(1L, provider.getMemberId(access));
@@ -30,7 +30,7 @@ class JwtProviderTest {
         assertNotEquals(provider.createRefreshToken(1L), provider.createRefreshToken(1L));
 
         JwtProvider expiredProvider = new JwtProvider(SECRET, -60000, -60000);
-        String expired = expiredProvider.createAccessToken(1L);
+        String expired = expiredProvider.createAccessToken(1L, "session-1");
         assertThrows(JwtException.class, () -> provider.getMemberId(expired));
     }
 }

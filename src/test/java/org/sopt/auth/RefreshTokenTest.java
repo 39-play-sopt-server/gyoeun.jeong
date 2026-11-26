@@ -29,9 +29,9 @@ class RefreshTokenTest {
     @Test
     void reissueRotatesStoredRefreshToken() {
         String oldToken = jwt.createRefreshToken(1L);
-        RefreshToken saved = new RefreshToken("hash", 1L, Instant.now().plusSeconds(60));
+        RefreshToken saved = new RefreshToken("hash", 1L, "session-1", Instant.now().plusSeconds(60));
         when(tokens.findByHashForUpdate(any())).thenReturn(Optional.of(saved), Optional.empty());
-        when(members.findByIdAndDeletedAtIsNull(1L)).thenReturn(Optional.of(
+        when(members.findActiveForUpdate(1L)).thenReturn(Optional.of(
                 new Member("이름", "user@example.com", "password")));
 
         TokenPair replacement = service.reissue(oldToken);
@@ -46,18 +46,38 @@ class RefreshTokenTest {
     @Test
     void reissueRejectsMissingOrWrongTypeToken() {
         assertThrows(InvalidRefreshTokenException.class, () -> service.reissue(null));
-        assertThrows(InvalidRefreshTokenException.class, () -> service.reissue(jwt.createAccessToken(1L)));
+        assertThrows(InvalidRefreshTokenException.class, () -> service.reissue(jwt.createAccessToken(1L, "session-1")));
         verifyNoInteractions(tokens);
     }
 
     @Test
     void reissueRejectsWithdrawnMember() {
         String token = jwt.createRefreshToken(1L);
-        when(tokens.findByHashForUpdate(any())).thenReturn(Optional.of(
-                new RefreshToken("hash", 1L, Instant.now().plusSeconds(60))));
-        when(members.findByIdAndDeletedAtIsNull(1L)).thenReturn(Optional.empty());
+        when(members.findActiveForUpdate(1L)).thenReturn(Optional.empty());
 
         assertThrows(InvalidRefreshTokenException.class, () -> service.reissue(token));
         verify(tokens, never()).save(any());
+    }
+
+    @Test
+    void logoutDeletesOnlyCurrentSession() {
+        RefreshToken saved = new RefreshToken("hash", 1L, "session-1", Instant.now().plusSeconds(60));
+        when(tokens.findSessionForUpdate("session-1", 1L)).thenReturn(Optional.of(saved));
+
+        service.logout(1L, "session-1");
+
+        verify(tokens).delete(saved);
+        verify(tokens, never()).deleteByMemberId(any());
+    }
+
+    @Test
+    void withdrawDeletesAllSessionsAndWithdrawsMember() {
+        Member member = new Member("이름", "user@example.com", "password");
+        when(members.findActiveForUpdate(1L)).thenReturn(Optional.of(member));
+
+        service.withdraw(1L);
+
+        verify(tokens).deleteByMemberId(1L);
+        assertTrue(member.isDeleted());
     }
 }

@@ -9,6 +9,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.sopt.auth.repository.RefreshTokenRepository;
+import org.sopt.member.repository.MemberRepository;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,9 +20,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String BEARER_PREFIX = "Bearer ";
 
     private final JwtProvider jwtProvider;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final MemberRepository memberRepository;
 
-    public JwtAuthenticationFilter(JwtProvider jwtProvider) {
+    public JwtAuthenticationFilter(JwtProvider jwtProvider, RefreshTokenRepository refreshTokenRepository, MemberRepository memberRepository) {
         this.jwtProvider = jwtProvider;
+        this.refreshTokenRepository = refreshTokenRepository;
+        this.memberRepository = memberRepository;
     }
 
     @Override
@@ -33,9 +39,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (token != null) {
             try {
-                Long memberId = jwtProvider.getMemberId(token);
+                JwtProvider.AccessIdentity identity = jwtProvider.getAccessIdentity(token);
+                Long memberId = identity.memberId();
+                if (!refreshTokenRepository.existsBySessionIdAndMemberId(identity.sessionId(), memberId)
+                        || memberRepository.findByIdAndDeletedAtIsNull(memberId).isEmpty()) {
+                    filterChain.doFilter(request, response);
+                    return;
+                }
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(memberId, null, List.of());
+                authentication.setDetails(identity.sessionId());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (JwtException | IllegalArgumentException e) {
                 // 유효하지 않은 토큰은 인증 정보로 저장하지 않습니다.

@@ -32,18 +32,6 @@ public class MemberController {
         );
     }
 
-    @DeleteMapping("/{memberId}")
-    public ApiResponse<Void> deleteMember(
-            @PathVariable("memberId") long memberId
-    ) {
-        service.deleteMember(memberId);
-
-        return ApiResponse.success(
-                MemberSuccessMessage.DELETED.getMessage(),
-                null
-        );
-    }
-
     @GetMapping("/me")
     public ApiResponse<Long> me(@AuthenticationPrincipal Long memberId) {
         return ApiResponse.success(MemberSuccessMessage.RETRIEVED.getMessage(), memberId);

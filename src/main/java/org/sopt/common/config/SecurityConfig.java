@@ -3,6 +3,8 @@ package org.sopt.common.config;
 import org.sopt.auth.ApiAuthenticationEntryPoint;
 import org.sopt.auth.jwt.JwtAuthenticationFilter;
 import org.sopt.auth.jwt.JwtProvider;
+import org.sopt.auth.repository.RefreshTokenRepository;
+import org.sopt.member.repository.MemberRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -19,10 +21,15 @@ public class SecurityConfig {
 
     private final JwtProvider jwtProvider;
     private final ApiAuthenticationEntryPoint authenticationEntryPoint;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final MemberRepository memberRepository;
 
-    public SecurityConfig(JwtProvider jwtProvider, ApiAuthenticationEntryPoint authenticationEntryPoint) {
+    public SecurityConfig(JwtProvider jwtProvider, ApiAuthenticationEntryPoint authenticationEntryPoint,
+                          RefreshTokenRepository refreshTokenRepository, MemberRepository memberRepository) {
         this.jwtProvider = jwtProvider;
         this.authenticationEntryPoint = authenticationEntryPoint;
+        this.refreshTokenRepository = refreshTokenRepository;
+        this.memberRepository = memberRepository;
     }
 
     @Bean
@@ -35,11 +42,11 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/auth/signup", "/auth/login", "/auth/reissue").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(e -> e.authenticationEntryPoint(authenticationEntryPoint))
                 .addFilterBefore(
-                        new JwtAuthenticationFilter(jwtProvider),
+                        new JwtAuthenticationFilter(jwtProvider, refreshTokenRepository, memberRepository),
                         UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

@@ -20,6 +20,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.HexFormat;
+import java.util.UUID;
 
 @Service
 public class AuthService {
@@ -59,12 +60,15 @@ public class AuthService {
         Member member = memberRepository.findByEmail(email)
                 .orElseThrow(InvalidCredentialsException::new);
 
+        member = memberRepository.findActiveForUpdate(member.getId())
+                .orElseThrow(InvalidCredentialsException::new);
+
         if (member.isDeleted() || !passwordEncoder.matches(password, member.getPassword())) {
             throw new InvalidCredentialsException();
         }
 
         refreshTokenRepository.deleteByExpiresAtBefore(Instant.now());
-        return issueTokens(member.getId());
+        return issueTokens(member.getId(), UUID.randomUUID().toString());
     }
 
     @Transactional
@@ -76,22 +80,38 @@ public class AuthService {
             throw new InvalidRefreshTokenException();
         }
 
+        memberRepository.findActiveForUpdate(memberId).orElseThrow(InvalidRefreshTokenException::new);
         RefreshToken saved = refreshTokenRepository.findByHashForUpdate(hash(token))
                 .orElseThrow(InvalidRefreshTokenException::new);
-        if (!memberId.equals(saved.getMemberId())
-                || memberRepository.findByIdAndDeletedAtIsNull(memberId).isEmpty()) {
+        if (!memberId.equals(saved.getMemberId())) {
             throw new InvalidRefreshTokenException();
         }
 
         refreshTokenRepository.delete(saved);
-        return issueTokens(memberId);
+        refreshTokenRepository.flush();
+        String sessionId = saved.getSessionId() == null ? UUID.randomUUID().toString() : saved.getSessionId();
+        return issueTokens(memberId, sessionId);
     }
 
-    private TokenPair issueTokens(Long memberId) {
-        String accessToken = jwtProvider.createAccessToken(memberId);
+    @Transactional
+    public void logout(Long memberId, String sessionId) {
+        refreshTokenRepository.findSessionForUpdate(sessionId, memberId)
+                .ifPresent(refreshTokenRepository::delete);
+    }
+
+    @Transactional
+    public void withdraw(Long memberId) {
+        Member member = memberRepository.findActiveForUpdate(memberId)
+                .orElseThrow(InvalidCredentialsException::new);
+        refreshTokenRepository.deleteByMemberId(memberId);
+        member.withdraw();
+    }
+
+    private TokenPair issueTokens(Long memberId, String sessionId) {
+        String accessToken = jwtProvider.createAccessToken(memberId, sessionId);
         String refreshToken = jwtProvider.createRefreshToken(memberId);
         refreshTokenRepository.save(new RefreshToken(
-                hash(refreshToken), memberId, Instant.now().plusMillis(refreshTokenExpiration)));
+                hash(refreshToken), memberId, sessionId, Instant.now().plusMillis(refreshTokenExpiration)));
         return new TokenPair(accessToken, refreshToken);
     }
 

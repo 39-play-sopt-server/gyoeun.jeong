@@ -28,21 +28,28 @@ public class JwtProvider {
         this.refreshTokenExpiration = refreshTokenExpiration;
     }
 
-    public String createAccessToken(Long memberId) {
-        return createToken(memberId, "access", accessTokenExpiration);
+    public record AccessIdentity(Long memberId, String sessionId) {
+    }
+
+    public String createAccessToken(Long memberId, String sessionId) {
+        return createToken(memberId, "access", accessTokenExpiration, sessionId);
     }
 
     public String createRefreshToken(Long memberId) {
-        return createToken(memberId, "refresh", refreshTokenExpiration);
+        return createToken(memberId, "refresh", refreshTokenExpiration, null);
     }
 
-    private String createToken(Long memberId, String type, long expiration) {
+    private String createToken(Long memberId, String type, long expiration, String sessionId) {
         Date now = new Date();
 
-        return Jwts.builder()
+        var builder = Jwts.builder()
                 .subject(String.valueOf(memberId))
                 .id(UUID.randomUUID().toString())
-                .claim("type", type)
+                .claim("type", type);
+        if (sessionId != null) {
+            builder.claim("sid", sessionId);
+        }
+        return builder
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + expiration))
                 .signWith(secretKey)
@@ -50,14 +57,23 @@ public class JwtProvider {
     }
 
     public Long getMemberId(String token) {
-        return getMemberId(token, "access");
+        return getAccessIdentity(token).memberId();
+    }
+
+    public AccessIdentity getAccessIdentity(String token) {
+        Claims claims = parseClaims(token, "access");
+        String sessionId = claims.get("sid", String.class);
+        if (sessionId == null || sessionId.isBlank()) {
+            throw new IllegalArgumentException("세션 정보가 없습니다.");
+        }
+        return new AccessIdentity(Long.valueOf(claims.getSubject()), sessionId);
     }
 
     public Long getRefreshTokenMemberId(String token) {
-        return getMemberId(token, "refresh");
+        return Long.valueOf(parseClaims(token, "refresh").getSubject());
     }
 
-    private Long getMemberId(String token, String expectedType) {
+    private Claims parseClaims(String token, String expectedType) {
         Claims claims = Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
@@ -67,6 +83,6 @@ public class JwtProvider {
         if (!expectedType.equals(claims.get("type", String.class))) {
             throw new IllegalArgumentException("토큰 종류가 올바르지 않습니다.");
         }
-        return Long.valueOf(claims.getSubject());
+        return claims;
     }
 }

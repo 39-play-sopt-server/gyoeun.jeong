@@ -3,7 +3,6 @@ package org.sopt.member.service;
 import org.sopt.member.domain.Member;
 import org.sopt.member.dto.MemberResponse;
 import org.sopt.member.exception.InvalidMemberException;
-import org.sopt.member.exception.MemberNotFoundException;
 import org.sopt.member.message.MemberErrorMessage;
 import org.sopt.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
@@ -35,15 +34,4 @@ public class MemberService {
         return MemberResponse.from(savedMember);
     }
 
-    @Transactional
-    public void deleteMember(long memberId) {
-        if (memberId <= 0) {
-            throw new InvalidMemberException(MemberErrorMessage.INVALID_MEMBER_ID);
-        }
-
-        Member member = repository.findByIdAndDeletedAtIsNull(memberId)
-                .orElseThrow(MemberNotFoundException::new);
-
-        member.withdraw();
-    }
 }

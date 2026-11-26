@@ -16,19 +16,27 @@ public class RefreshToken {
     @Column(nullable = false)
     private Long memberId;
 
+    @Column(unique = true, length = 36)
+    private String sessionId;
+
     @Column(nullable = false)
     private Instant expiresAt;
 
     protected RefreshToken() {
     }
 
-    public RefreshToken(String tokenHash, Long memberId, Instant expiresAt) {
+    public RefreshToken(String tokenHash, Long memberId, String sessionId, Instant expiresAt) {
         this.tokenHash = tokenHash;
         this.memberId = memberId;
+        this.sessionId = sessionId;
         this.expiresAt = expiresAt;
     }
 
     public Long getMemberId() {
         return memberId;
+    }
+
+    public String getSessionId() {
+        return sessionId;
     }
 }
