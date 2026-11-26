@@ -30,10 +30,6 @@ public class Member extends BaseEntity {
     protected Member() {
     }
 
-    public Member(String name) {
-        this.name = name;
-    }
-
     public Member(String name, String email, String password) {
         this.name = name;
         this.email = email;
